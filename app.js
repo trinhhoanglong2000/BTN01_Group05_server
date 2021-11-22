@@ -17,6 +17,7 @@ const registerRouter = require('./api/Register');
 const classesaccountRouter = require('./api/classesaccount');
 const accountRouter = require('./api/Account');
 const gradeRouter = require('./api/Grade');
+const homeWorkRouter = require('./api/HomeWork')
 const app = express();
 app.use(passport.initialize());
 
@@ -31,8 +32,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/', indexRouter);
+app.use('/homeWork',homeWorkRouter );
 app.use('/classes', classesRouter);
 app.use('/mail', mailRouter);
 app.use('/login',loginRouter);
