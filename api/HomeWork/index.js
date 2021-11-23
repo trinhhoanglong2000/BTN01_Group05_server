@@ -3,8 +3,8 @@ const router = express.Router();
 const HomeWorkController = require('./HomeWorkController');
 const passport = require('../../authentication/index')
 
-router.post('/AddHomeWord', HomeWorkController.AddHomeWork);
-router.post('/UpdateHomeWork', HomeWorkController.UpdateHomeWork);
-router.post('/RemoveHomeWork', HomeWorkController.RemoveHomeWork);
+router.post('/AddHomeWord',  passport.authenticate('jwt', { session: false }), HomeWorkController.AddHomeWork);
+router.post('/UpdateHomeWork', passport.authenticate('jwt', { session: false }), HomeWorkController.UpdateHomeWork);
+router.post('/RemoveHomeWork',  passport.authenticate('jwt', { session: false }),HomeWorkController.RemoveHomeWork);
 
 module.exports = router;

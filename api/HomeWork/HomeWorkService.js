@@ -130,3 +130,22 @@ exports.RemoveHomeWork = async (homeWorkID) =>{
   }
   return true
 }
+
+exports.CheckTeacher = async (ClassID, UserID) =>{
+  try {
+    const COUNT = await poolean.query(
+    `
+    SELECT COUNT(*) 
+    FROM \"classesaccount\"
+    WHERE classid = $1 AND accountid = $2 AND type = true
+    `,
+    [ClassID, UserID]
+    );
+    if(COUNT != 0 )
+        return true
+    else
+        return false
+  } catch (err) {
+    return false
+  }
+}
