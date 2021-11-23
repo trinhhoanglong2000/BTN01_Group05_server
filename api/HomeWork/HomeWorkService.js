@@ -84,11 +84,11 @@ exports.CheckHomeWork = async (id) => {
 exports.UpdateHomeWork =async (homeWork) =>{
   try {
        await poolean.query(
-        `UPDATE "Homework" 
+        `UPDATE \"Homework\"
         SET  name =$2 ,description = $3, grade = $4, endday=$5
         WHERE id=$1 `,
       [
-          uuidv4(),
+          homeWork.id,
           homeWork.name,
           homeWork.description,
           homeWork.grade,
@@ -111,16 +111,22 @@ exports.RemoveHomeWork = async (homeWorkID) =>{
       WHERE id = $1
       LIMIT 1
       `,
-        [homeWorkID]
+        [homeWorkID.id]
       );
-    
+      console.log( homeWork.rows[0])
       await poolean.query(
         `DELETE FROM "grade" WHERE idclass = $1 AND idhomework = $2;
-        DELETE FROM "Homework" WHERE id = $3;
          `,
       [
         homeWork.rows[0].idclass,
-        homeWork.rows[0].idhomework,
+        homeWork.rows[0].idhomework
+      ]
+      );
+      await poolean.query(
+        `
+        DELETE FROM "Homework" WHERE id = $1;
+         `,
+      [
         homeWork.rows[0].id
       ]
       );
@@ -130,7 +136,23 @@ exports.RemoveHomeWork = async (homeWorkID) =>{
   }
   return true
 }
-
+exports.GetHomeWorkByClassID = async (classId) =>{
+  try {
+      const homeWork = await poolean.query(
+      `
+      SELECT * 
+      FROM  \"Homework\"
+      WHERE idclass = $1
+      `,
+        [classId]
+      );
+      console.log(homeWork)
+      return homeWork.rows
+  }catch(err){
+      console.log(err);
+      return null;
+  }
+}
 exports.CheckTeacher = async (ClassID, UserID) =>{
   try {
     const COUNT = await poolean.query(

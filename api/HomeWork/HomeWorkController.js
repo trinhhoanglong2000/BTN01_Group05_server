@@ -1,30 +1,30 @@
 const HomeworkService = require('./HomeWorkService');
 exports.AddHomeWork = async (req,res) =>{
-    let userData = null;
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.split(" ")[0] === "Bearer"
-    ) {
-        var authToken = req.headers.authorization.split(" ")[1];
-        try {
-        userData = jwt.verify(authToken, process.env.JWT_SECRET);
-        } catch (err) {
-        res.status(404).json({
-            message: "User not valid",
-        });
-        }
-    } else {
-        res.status(404).json({
-        message: "User not valid",
-        });
-    }
+    // let userData = null;
+    // if (
+    //     req.headers.authorization &&
+    //     req.headers.authorization.split(" ")[0] === "Bearer"
+    // ) {
+    //     var authToken = req.headers.authorization.split(" ")[1];
+    //     try {
+    //     userData = jwt.verify(authToken, process.env.JWT_SECRET);
+    //     } catch (err) {
+    //     res.status(404).json({
+    //         message: "User not valid",
+    //     });
+    //     }
+    // } else {
+    //     res.status(404).json({
+    //     message: "User not valid",
+    //     });
+    // }
    
     var HomeworkInfo = {...req.body, startday : getCurrentTime() }
     console.log(HomeworkInfo);
     // Validation
     try{
-        if(!await HomeworkService.CheckTeacher(HomeworkInfo.idclass, userData.id))
-            res.status(400).json({message: "Only teacher can create homework"}) 
+        // if(!await HomeworkService.CheckTeacher(HomeworkInfo.idclass, userData.id))
+        //     res.status(400).json({message: "Only teacher can create homework"}) 
         if(!(await HomeworkService.CheckClass(HomeworkInfo.idclass)))
             res.status(400).json({message: "Class not found", data:HomeworkInfo}) 
         if(!(await HomeworkService.CheckGradeStructure(isTimestamp.idgradestructure) ))
@@ -45,31 +45,31 @@ exports.AddHomeWork = async (req,res) =>{
    
 }
 exports.UpdateHomeWork = async (req,res) =>{
-    let userData = null;
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.split(" ")[0] === "Bearer"
-    ) {
-        var authToken = req.headers.authorization.split(" ")[1];
-        try {
-        userData = jwt.verify(authToken, process.env.JWT_SECRET);
-        } catch (err) {
-        res.status(404).json({
-            message: "User not valid",
-        });
-        }
-    } else {
-        res.status(404).json({
-        message: "User not valid",
-        });
-    }
+    // let userData = null;
+    // if (
+    //     req.headers.authorization &&
+    //     req.headers.authorization.split(" ")[0] === "Bearer"
+    // ) {
+    //     var authToken = req.headers.authorization.split(" ")[1];
+    //     try {
+    //     userData = jwt.verify(authToken, process.env.JWT_SECRET);
+    //     } catch (err) {
+    //     res.status(404).json({
+    //         message: "User not valid",
+    //     });
+    //     }
+    // } else {
+    //     res.status(404).json({
+    //     message: "User not valid",
+    //     });
+    // }
 
     var UpdateInfo = {...req.body }
     console.log(UpdateInfo);
     // Validation
     try{
-        if(!await HomeworkService.CheckTeacher(HomeworkInfo.idclass, userData.id))
-            res.status(400).json({message: "Only teacher can change homework"}) 
+        // if(!await HomeworkService.CheckTeacher(HomeworkInfo.idclass, userData.id))
+        //     res.status(400).json({message: "Only teacher can change homework"}) 
         if(!(await HomeworkService.CheckHomeWork(UpdateInfo.id)))
             res.status(400).json({message: "HomeWork not found", data:UpdateInfo}) 
     }catch(err){
@@ -89,31 +89,31 @@ exports.UpdateHomeWork = async (req,res) =>{
 }
 
 exports.RemoveHomeWork = async (req,res) =>{
-    let userData = null;
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.split(" ")[0] === "Bearer"
-    ) {
-        var authToken = req.headers.authorization.split(" ")[1];
-        try {
-        userData = jwt.verify(authToken, process.env.JWT_SECRET);
-        } catch (err) {
-        res.status(404).json({
-            message: "User not valid",
-        });
-        }
-    } else {
-        res.status(404).json({
-        message: "User not valid",
-        });
-    }
+    // let userData = null;
+    // if (
+    //     req.headers.authorization &&
+    //     req.headers.authorization.split(" ")[0] === "Bearer"
+    // ) {
+    //     var authToken = req.headers.authorization.split(" ")[1];
+    //     try {
+    //     userData = jwt.verify(authToken, process.env.JWT_SECRET);
+    //     } catch (err) {
+    //     res.status(404).json({
+    //         message: "User not valid",
+    //     });
+    //     }
+    // } else {
+    //     res.status(404).json({
+    //     message: "User not valid",
+    //     });
+    // }
     
     var HomoWorkID = {...req.body }
     console.log(HomoWorkID);
     // Validation
     try{
-        if(!await HomeworkService.CheckTeacher(HomeworkInfo.idclass, userData.id))
-            res.status(400).json({message: "Only teacher can remove homework"}) 
+        // if(!await HomeworkService.CheckTeacher(HomeworkInfo.idclass, userData.id))
+        //     res.status(400).json({message: "Only teacher can remove homework"}) 
         if(!(await HomeworkService.CheckHomeWork(HomoWorkID.id)))
             res.status(400).json({message: "HomeWork not found", data:HomoWorkID}) 
     }catch(err){
@@ -128,6 +128,42 @@ exports.RemoveHomeWork = async (req,res) =>{
     }       
    
 }
+
+exports.GetHomeWorkByClassID = async (req, res) => {
+    // let userData = null;
+    // if (
+    //   req.headers.authorization &&
+    //   req.headers.authorization.split(" ")[0] === "Bearer"
+    // ) {
+    //   var authToken = req.headers.authorization.split(" ")[1];
+    //   try {
+    //     userData = jwt.verify(authToken, process.env.JWT_SECRET);
+    //   } catch (err) {
+    //     res.status(404).json({
+    //       message: "User not valid",
+    //     });
+    //   }
+    // } else {
+    //   res.status(404).json({
+    //     message: "User not valid",
+    //   });
+    // }
+    var classID = req.query.classid 
+    console.log(classID)
+    try {
+        // if(!await HomeworkService.CheckTeacher(HomeWorkID, userData.id))
+        //     res.status(400).json({message: "Only teacher can remove homework"}) 
+        if(!(await HomeworkService.CheckClass(classID)))
+            res.status(400).json({message: "Class not found", data:{classId: classID}}) 
+        const homeWorks = await HomeworkService.GetHomeWorkByClassID(classID)
+        res.status(200).json({message: "Successful", data:homeWorks})
+    } catch (err) {
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(404).json({
+        message: "Error processing",
+        });
+    }
+  };
 
 function isTimestamp(input){
     let endTime = null 
