@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 
 exports.AddHomeWork =async (homeWork) =>{
     try {
-        Account = await poolean.query(
+        await poolean.query(
         `
         INSERT INTO \"Homework\" (id, idclass, name,description, grade, startday,endday,idgradestructure)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -83,7 +83,7 @@ exports.CheckHomeWork = async (id) => {
 }
 exports.UpdateHomeWork =async (homeWork) =>{
   try {
-      Account = await poolean.query(
+       await poolean.query(
         `UPDATE "Homework" 
         SET  name =$2 ,description = $3, grade = $4, endday=$5
         WHERE id=$1 `,
@@ -114,7 +114,7 @@ exports.RemoveHomeWork = async (homeWorkID) =>{
         [homeWorkID]
       );
     
-      Account = await poolean.query(
+      await poolean.query(
         `DELETE FROM "grade" WHERE idclass = $1 AND idhomework = $2;
         DELETE FROM "Homework" WHERE id = $3;
          `,
