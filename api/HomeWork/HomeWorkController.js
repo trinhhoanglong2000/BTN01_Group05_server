@@ -24,6 +24,48 @@ exports.AddHomeWork = async (req,res) =>{
     }
    
 }
+exports.UpdateHomeWork = async (req,res) =>{
+    var UpdateInfo = {...req.body }
+    console.log(UpdateInfo);
+    // Validation
+    try{
+        if(!(await HomeworkService.CheckHomeWork(UpdateInfo.id)))
+            res.status(400).json({message: "HomeWork not found", data:UpdateInfo}) 
+    }catch(err){
+        console.log(err)
+        res.status(400).json({message: "Validation process error", data:UpdateInfo })
+    }
+    if(!isTimestamp(UpdateInfo.endday))
+        res.status(400).json({message: "Time error", data:UpdateInfo}) 
+    else{
+        if(!await HomeworkService.UpdateHomeWork(UpdateInfo)){
+            res.status(400).json({message: "Storaged error", data:UpdateInfo })
+        }else{
+            res.status(200).json({message: "Successful", data:UpdateInfo })
+        }
+    }
+   
+}
+
+exports.RemoveHomeWork = async (req,res) =>{
+    var HomoWorkID = {...req.body }
+    console.log(HomoWorkID);
+    // Validation
+    try{
+        if(!(await HomeworkService.CheckHomeWork(HomoWorkID.id)))
+            res.status(400).json({message: "HomeWork not found", data:HomoWorkID}) 
+    }catch(err){
+        console.log(err)
+        res.status(400).json({message: "Validation process error", data:HomoWorkID })
+    }
+    
+    if(!await HomeworkService.RemoveHomeWork(HomoWorkID)){
+        res.status(400).json({message: "Storaged error", data:HomoWorkID })
+    }else{
+        res.status(200).json({message: "Successful", data:HomoWorkID })
+    }       
+   
+}
 
 function isTimestamp(input){
     let endTime = null 

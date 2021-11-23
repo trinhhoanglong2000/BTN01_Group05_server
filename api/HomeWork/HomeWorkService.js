@@ -55,12 +55,78 @@ exports.CheckGradeStructure = async (idgradestructure) => {
         `,
           [idgradestructure]
         );
-        if(COUNT != 0 ){
-            return true
-        }else{
-            return false
-        }
+        if(COUNT != 0 )
+            return true;
+        else
+            return false;
       } catch (err) {
         return false
       }
+}
+exports.CheckHomeWork = async (id) => {
+  try {
+      const COUNT = await poolean.query(
+      `
+      SELECT COUNT(*) 
+      FROM  \"Homework\"
+      WHERE id = $1
+      `,
+        [id]
+      );
+      if(COUNT != 0 )
+          return true
+      else
+          return false
+    } catch (err) {
+      return false
+    }
+}
+exports.UpdateHomeWork =async (homeWork) =>{
+  try {
+      Account = await poolean.query(
+        `UPDATE "Homework" 
+        SET  name =$2 ,description = $3, grade = $4, endday=$5
+        WHERE id=$1 `,
+      [
+          uuidv4(),
+          homeWork.name,
+          homeWork.description,
+          homeWork.grade,
+          homeWork.endday
+      ]
+      );
+  }catch(err){
+      console.log(err);
+      return false;
+  }
+  return true
+}
+
+exports.RemoveHomeWork = async (homeWorkID) =>{
+  try {
+      const homeWork = await poolean.query(
+      `
+      SELECT * 
+      FROM  \"Homework\"
+      WHERE id = $1
+      LIMIT 1
+      `,
+        [homeWorkID]
+      );
+    
+      Account = await poolean.query(
+        `DELETE FROM "grade" WHERE idclass = $1 AND idhomework = $2;
+        DELETE FROM "Homework" WHERE id = $3;
+         `,
+      [
+        homeWork.rows[0].idclass,
+        homeWork.rows[0].idhomework,
+        homeWork.rows[0].id
+      ]
+      );
+  }catch(err){
+      console.log(err);
+      return false;
+  }
+  return true
 }
