@@ -1,7 +1,7 @@
 const poolean = require("../../Database/index.js");
 const { v4: uuidv4 } = require("uuid");
 
-exports.AddHomeWork =async (homeWork) =>{
+exports.AddHomeWork =async (homeWork,id) =>{
     try {
         await poolean.query(
         `
@@ -10,7 +10,7 @@ exports.AddHomeWork =async (homeWork) =>{
         RETURNING *
         `,
         [
-            uuidv4(),
+            id,
             homeWork.idclass,
             homeWork.name,
             homeWork.description,
@@ -31,12 +31,14 @@ exports.CheckClass = async (idclass) => {
         const COUNT = await poolean.query(
         `
         SELECT COUNT(*) 
-        FROM \"Classes\"
+        FROM "Classes"
         WHERE id = $1
         `,
           [idclass]
         );
-        if(COUNT != 0 ){
+ 
+
+        if(COUNT.rows[0].count != 0 ){
             return true
         }else{
             return false
@@ -46,16 +48,19 @@ exports.CheckClass = async (idclass) => {
       }
 }
 exports.CheckGradeStructure = async (idgradestructure) => {
+
+    if (idgradestructure==null) return false    
     try {
         const COUNT = await poolean.query(
         `
         SELECT COUNT(*) 
-        FROM \"GradeStructure\"
+        FROM "GradeStructure"
         WHERE id = $1
         `,
           [idgradestructure]
         );
-        if(COUNT != 0 )
+
+        if(COUNT.rows[0].count != 0 )
             return true;
         else
             return false;
@@ -73,7 +78,8 @@ exports.CheckHomeWork = async (id) => {
       `,
         [id]
       );
-      if(COUNT != 0 )
+      
+      if(COUNT.rows[0].count != 0 )
           return true
       else
           return false
@@ -85,14 +91,15 @@ exports.UpdateHomeWork =async (homeWork) =>{
   try {
        await poolean.query(
         `UPDATE \"Homework\"
-        SET  name =$2 ,description = $3, grade = $4, endday=$5
+        SET  name =$2 ,description = $3, grade = $4, endday=$5, idgradestructure=$6
         WHERE id=$1 `,
       [
           homeWork.id,
           homeWork.name,
           homeWork.description,
           homeWork.grade,
-          homeWork.endday
+          homeWork.endday,
+          homeWork.idgradestructure,
       ]
       );
   }catch(err){
@@ -113,7 +120,6 @@ exports.RemoveHomeWork = async (homeWorkID) =>{
       `,
         [homeWorkID.id]
       );
-      console.log( homeWork.rows[0])
       await poolean.query(
         `DELETE FROM "grade" WHERE idclass = $1 AND idhomework = $2;
          `,
@@ -146,7 +152,6 @@ exports.GetHomeWorkByClassID = async (classId) =>{
       `,
         [classId]
       );
-      console.log(homeWork)
       return homeWork.rows
   }catch(err){
       console.log(err);
@@ -163,7 +168,7 @@ exports.CheckTeacher = async (ClassID, UserID) =>{
     `,
     [ClassID, UserID]
     );
-    if(COUNT != 0 )
+    if(COUNT.rows[0].count != 0 )
         return true
     else
         return false

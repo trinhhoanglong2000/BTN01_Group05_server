@@ -3,7 +3,7 @@ const poolean = require("../../Database/index.js");
 exports.GetAllAccount = async (req, res, user) => {
   
   const id = req.params.id;
-  console.log("HEHE boiz")
+ 
   //Validate if the user is exist in the class
 
   

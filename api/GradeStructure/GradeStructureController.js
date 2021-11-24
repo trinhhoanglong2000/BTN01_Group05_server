@@ -9,7 +9,6 @@ exports.GetGradeStructure = async (req, res, user) => {
     FROM "GradeStructure"
     WHERE idclass = $1
     `, [req.params.id])
-        console.log(data.rows)
         res.header({ "Access-Control-Allow-Origin": "*" });
         res.status(200).json({ data: data.rows, success: true });
     } catch (err) {
@@ -24,7 +23,6 @@ exports.GetGradeStructure = async (req, res, user) => {
 //const
 exports.addStructure = async function (req, res) {
     const StructureInfo = req;
-    console.log(StructureInfo)
     
     try {
         const Structureid = uuidv4();

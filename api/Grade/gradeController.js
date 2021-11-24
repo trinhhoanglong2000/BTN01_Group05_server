@@ -14,7 +14,6 @@ exports.GetAllGrade = async (req, res, user) => {
     INNER JOIN "Homework" ON "Homework".id = grade.idhomework)
     WHERE grade.idaccount = $1;
     `,[user.id])
-        console.log(data.rows)
     res.header({ "Access-Control-Allow-Origin": "*" });
     res.status(200).json({ data: data.rows, success: true });
   } catch (err) {
