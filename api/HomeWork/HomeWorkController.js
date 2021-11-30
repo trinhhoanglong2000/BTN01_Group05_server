@@ -1,7 +1,8 @@
 const HomeworkService = require("./HomeWorkService");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
-
+const poolean = require("../../Database/index.js");
+const e = require("express");
 exports.AddHomeWork = async (req, res) => {
   let userData = null;
   if (
@@ -251,6 +252,102 @@ function isTimestamp(input) {
   return true;
 }
 
+
+exports.UploadScore = async (req, res) => {
+  var data = { ...req.body };
+  var homeworkData = data.homeworkData;
+  var classId = data.classId
+  var homeworkId = data.homeworkId
+  let newData = [];
+  let errRow = [];
+
+
+    for (let i =0; i< homeworkData.length; i++){
+
+      // Co student ID
+      try {
+        const StudentInfo = await poolean.query(
+          `
+          SELECT * 
+          FROM \"Account\"
+          WHERE student_id = $1 
+          LIMIT 1
+          `,
+          [homeworkData[i].StudentID]
+        );
+      
+        //Student ID co trong lop
+        if (StudentInfo.rows.length >0){
+          
+          const CheckStudentInClass = await poolean.query(
+            `
+            SELECT COUNT(*) 
+            FROM "classesaccount" 
+            WHERE classid = $1 AND accountid =$2
+            `,
+              [classId, StudentInfo.rows[0].id],
+            );
+          //
+      
+          if (CheckStudentInClass.rows[0].count != 0 ){
+            
+            const CheckGradeExits= await poolean.query(
+              `
+              SELECT COUNT(*) 
+              FROM "grade" 
+              WHERE idhomework = $1 AND idclass =$2 AND idaccount =$3 
+              `,
+                [homeworkId, classId, StudentInfo.rows[0].id],
+              );
+           
+            if(CheckGradeExits.rows[0].count ==0){
+              
+              let addGrade = await poolean.query(
+                `
+              INSERT INTO "grade"  (grade,idaccount,idclass,idhomework )
+              VALUES ($1, $2, $3,$4)
+              RETURNING *
+              `,
+                [homeworkData[i].Grade, StudentInfo.rows[0].id, classId, homeworkId]
+              );
+              newData.add(addGrade.rows[0])
+            }
+            else{
+              
+              let addGrade = await poolean.query(
+                `
+                UPDATE "grade" 
+                SET grade=$4
+                WHERE idhomework = $1 AND idclass =$2 AND idaccount =$3 
+                RETURNING *
+              `,
+                [homeworkId, classId, StudentInfo.rows[0].id,homeworkData[i].Grade]
+              );
+              newData.push(addGrade.rows[0])
+            }
+          }else{
+            errRow.push(homeworkData[i])
+          }
+        }else{
+          errRow.push(homeworkData[i])
+        }
+      } catch (error) {
+        console.log(error)
+        res.status(400).json({
+          message: "Process Error",
+        });
+      }
+      
+     
+    }
+  
+   res.status(200).json({
+      message: "Successful",
+      newData: newData,
+      errRow: errRow
+    });
+  
+};
 function getCurrentTime() {
   let date_ob = new Date();
 
