@@ -66,4 +66,5 @@ router.post(
   classController.addClassesAccount
 );
 
+router.post("/addStudentList", passport.authenticate("jwt", { session: false }),classController.addStudentList)
 module.exports = router;

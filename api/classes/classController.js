@@ -93,3 +93,58 @@ exports.addClassesAccount = async function (req, res) {
     });
   }
 };
+exports.addStudentList = async function (req, res) {
+  const data = { ...req.body};
+  let listStudentData = data.listStudentData
+  let classId = data.classId
+  let newData = [];
+  try {
+    for (let i =0; i< listStudentData.length; i++){
+      console.log(listStudentData[i])
+      const StudentInfo = await poolean.query(
+        `
+        SELECT * 
+        FROM \"Account\"
+        WHERE student_id = $1 
+        LIMIT 1
+        `,
+        [listStudentData[i].StudentID]
+      );
+      console.log(StudentInfo.rows[0])
+      if (StudentInfo.rows.length >0){
+        
+        const COUNT = await poolean.query(
+          `
+          SELECT COUNT(*) 
+          FROM "classesaccount" 
+          WHERE classid = $1 AND accountid =$2
+          `,
+            [classId, StudentInfo.rows[0].id],
+          );
+        
+        if (COUNT.rows[0].count == 0 ){
+          newData.push(StudentInfo.rows[0])
+
+          const classItemAfterInstall = await poolean.query(
+            `
+          INSERT INTO classesaccount (classid, accountid, type)
+          VALUES ($1, $2, $3)
+          RETURNING *
+          `,
+            [classId, StudentInfo.rows[0].id, false]
+          );
+        }
+      }
+    }
+  }catch(err){
+    res.status(400).json({
+      message: "Process Error",
+    });
+  }
+   res.status(200).json({
+      message: "Successful",
+      newData: newData
+    });
+};
+
+
