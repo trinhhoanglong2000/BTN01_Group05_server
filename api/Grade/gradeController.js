@@ -80,24 +80,12 @@ exports.UpdateAllGradeFromClass = async (data, res) => {
           ]
         );
       } else {
-        //kiem tra thang do co trong lop do khong
-        const count = await poolean.query(
-          `
-          SELECT COUNT(*) 
-          FROM "classesaccount" 
-          WHERE accountid = $1 AND classid =$2 
-          `,
-          [element.idaccount, element.idclass]
-        );
-        
-        if (count.rows[0].count !== 0) {
-          await poolean.query(
-            `UPDATE GRADE  
+        await poolean.query(
+          `UPDATE GRADE  
             SET grade=$1
             WHERE idhomework=$2 AND idaccount=$3 `,
-            [element.grade, element.idhomework, element.idaccount]
-          );
-        }
+          [element.grade, element.idhomework, element.idaccount]
+        );
       }
     }
 
