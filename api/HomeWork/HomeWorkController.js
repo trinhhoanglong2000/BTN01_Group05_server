@@ -283,7 +283,7 @@ exports.UploadScore = async (req, res) => {
             `
             SELECT COUNT(*) 
             FROM "classesaccount" 
-            WHERE classid = $1 AND accountid =$2
+            WHERE classid = $1 AND accountid =$2 AND type = false
             `,
               [classId, StudentInfo.rows[0].id],
             );
