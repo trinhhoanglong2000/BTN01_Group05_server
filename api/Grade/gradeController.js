@@ -81,6 +81,7 @@ exports.UpdateAllGradeFromClass = async (data, res) => {
         );
       } else {
         await poolean.query(
+          
           `UPDATE GRADE  
             SET grade=$1
             WHERE idhomework=$2 AND idaccount=$3 `,
@@ -90,7 +91,28 @@ exports.UpdateAllGradeFromClass = async (data, res) => {
     }
 
     //
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(200).json({ data: data.rows, success: true });
+  } catch (err) {
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(404).json({
+      message: "No grade available",
+      success: false,
+    });
+  }
+};
+exports.GetAllGradeOfStudentFromClass = async (req, res, user) => {
+  const id = req.params.id;
+  //Validate if the user is exist in the class
+  console.log(id)
+  try {
 
+    const data = await poolean.query(
+      ` SELECT * 
+        FROM "Homework" INNER JOIN grade ON ("Homework".id = grade.idhomework)
+        WHERE grade.idclass = $1 and grade.idaccount = $2`, [id,user.id]
+    );
+    // ,[id,user.id]);
     res.header({ "Access-Control-Allow-Origin": "*" });
     res.status(200).json({ data: data.rows, success: true });
   } catch (err) {
