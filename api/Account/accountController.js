@@ -36,7 +36,7 @@ exports.getAllAccount = async (req, res) => {
       return
     }
     const data = await poolean.query(
-      'SELECT email,firstname,lastname,gender,phone,admin,dob FROM "Account"',
+      'SELECT email,firstname,lastname,gender,phone,admin,dob,student_id,id,isban FROM "Account"',
       
     );
     

@@ -19,6 +19,8 @@ const accountRouter = require('./api/Account');
 const gradeRouter = require('./api/Grade');
 const homeWorkRouter = require('./api/HomeWork')
 const gradeStructureRouter = require('./api/GradeStructure');
+const adminRouter = require('./api/Admin');
+
 const app = express();
 app.use(passport.initialize());
 
@@ -43,6 +45,8 @@ app.use('/classesaccount',classesaccountRouter);
 app.use('/Account',accountRouter);
 app.use('/Grade',gradeRouter)
 app.use('/GradeStructure', gradeStructureRouter)
+app.use('/Admin', adminRouter)
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
