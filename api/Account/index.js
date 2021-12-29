@@ -22,6 +22,46 @@ router.get("/", function (req, res, next) {
     }
   )(req, res, next);
 });
+router.get("/getAll", function (req, res, next) {
+  passport.authenticate(
+    "jwt",
+    {
+      session: false,
+    },
+    function (err, user, info) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(401);
+        res.send({ message: info.message, success: false });
+        return;
+      }
+      accountController.getAllAccount(user, res);
+    }
+  )(req, res, next);
+});
+router.get("/isAdmin", function (req, res, next) {
+  passport.authenticate(
+    "jwt",
+    {
+      session: false,
+    },
+    function (err, user, info) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(401);
+        res.send({ message: info.message, success: false });
+        return;
+      }
+      accountController.isAdmin(user, res);
+    }
+  )(req, res, next);
+});
 router.post("/Update", function (req, res, next) {
   passport.authenticate(
     "jwt",

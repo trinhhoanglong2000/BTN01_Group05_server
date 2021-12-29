@@ -20,6 +20,55 @@ exports.getAccount = async (req, res) => {
     });
   }
 };
+exports.getAllAccount = async (req, res) => {
+  try {
+    const check = await poolean.query(
+      'SELECT * FROM "Account" WHERE "Account".id=$1 ',
+      [req.id]
+    );
+    //check admin
+    if (!check.rows[0].admin){
+      res.header({ "Access-Control-Allow-Origin": "*" });
+      res.status(404).json({
+        success: false,
+        message: "No class available",
+      });
+      return
+    }
+    const data = await poolean.query(
+      'SELECT email,firstname,lastname,gender,phone,admin,dob FROM "Account"',
+      
+    );
+    
+
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(200).json({ data: data.rows, success: true });
+  } catch (err) {
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(404).json({
+      success: false,
+      message: "No class available",
+    });
+  }
+};
+exports.isAdmin = async (req, res) => {
+  try {
+    const data = await poolean.query(
+      'SELECT * FROM "Account" WHERE "Account".id=$1 ',
+      [req.id]
+    );
+    
+
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(200).json({ data: data.rows[0].admin, success: true });
+  } catch (err) {
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(404).json({
+      success: false,
+      message: "No class available",
+    });
+  }
+};
 exports.updateUser = async (req, res) => {
   try {
     //Check valid
