@@ -28,12 +28,58 @@ router.get("/", function (req, res, next) {
     }
   )(req, res, next);
 });
+router.get("/getAllClasses", function (req, res, next) {
+  passport.authenticate(
+    "jwt",
+    {
+      session: false,
+    },
+    function (err, user, info) {
+      
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(401);
+        res.send({ message: info.message, success: false });
+        return;
+      }
+      classController.getAllClassesAdmin(user, res);
+    }
+  )(req, res, next);
+});
 router.get(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   classController.detail
 );
+router.post(
+  "/updateClass", function (req, res, next) {
+    passport.authenticate(
+      "jwt",
+      {
+        session: false,
+      },
+      function (err, user, info) {
+        
+        if (err) {
+          return next(err);
+        }
+        if (!user) {
+          res.header({ "Access-Control-Allow-Origin": "*" });
+          res.status(401);
+          res.send({ message: info.message, success: false });
+          return;
+        }
+       
 
+        classController.updateClass({...req.body}, res,user.id);
+
+      }
+    )(req, res, next);
+  }
+);
 router.post(
   "/addClass", function (req, res, next) {
     passport.authenticate(
