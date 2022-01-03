@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('classapi:server');
 var http = require('http');
 
+
 /**
  * Get port from environment and store in Express.
  */
@@ -24,6 +25,45 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
+// Socket
+const { Server } = require("socket.io")
+const io = new Server({
+  cors: {
+    origin: process.env.CLIENT_URL
+  }
+})
+let onlineUsers = []
+
+const addNewUser = (username, socketId) => {
+  !onlineUsers.some(user => user.username === username) && onlineUsers.push({ username, socketId })
+}
+const removeUser = (socketId) => {
+  onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
+}
+const getUser = (username) => {
+  return onlineUsers.find(user => user.username === username)
+}
+
+console.log(process.env.CLIENT_URL)
+io.on("connection", (socket) => {
+  console.log('a user connected');
+
+  socket.on("newUser", (username) => {
+    addNewUser(username, socket.id)
+    console.log(username + " added to online section")
+    console.log(onlineUsers.length)
+  })
+  socket.on("removeUser", () =>{
+    removeUser(socket.id)
+    console.log(onlineUsers.length)
+  })
+  socket.on("disconnect", () => {
+    removeUser(socket.id)
+    console.log('a user disconnected')
+  })
+});
+console.log(onlineUsers)
+io.listen(server)
 
 server.listen(port);
 server.on('error', onError);

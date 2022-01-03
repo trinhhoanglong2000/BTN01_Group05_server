@@ -21,8 +21,11 @@ const homeWorkRouter = require('./api/HomeWork')
 const gradeStructureRouter = require('./api/GradeStructure');
 const adminRouter = require('./api/Admin');
 
+
+
 const app = express();
 app.use(passport.initialize());
+
 
 // view engine setup
 //console.log(uuidv4())
@@ -36,24 +39,24 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
-app.use('/homeWork',homeWorkRouter );
+app.use('/homeWork', homeWorkRouter);
 app.use('/classes', classesRouter);
 app.use('/mail', mailRouter);
-app.use('/login',loginRouter);
-app.use('/register',registerRouter);
-app.use('/classesaccount',classesaccountRouter);
-app.use('/Account',accountRouter);
-app.use('/Grade',gradeRouter)
+app.use('/login', loginRouter);
+app.use('/register', registerRouter);
+app.use('/classesaccount', classesaccountRouter);
+app.use('/Account', accountRouter);
+app.use('/Grade', gradeRouter)
 app.use('/GradeStructure', gradeStructureRouter)
 app.use('/Admin', adminRouter)
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -62,5 +65,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 module.exports = app;
