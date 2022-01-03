@@ -348,6 +348,40 @@ exports.UploadScore = async (req, res) => {
     });
   
 };
+//Long-TP ADD START 2022/1/3
+exports.MakeDone =  async (req, res) => {
+  console.log(req.body)
+  var data = { ...req.body };
+  var homeWorkID = data.homeWorkID;
+  if(HomeworkService.MakeDone(homeWorkID))
+  {
+    res.status(200).json({
+        message: "Successful",
+    });
+  }
+  else{
+    res.status(409).json({
+      message: "Fail",
+  });
+  }
+};
+exports.InProcess =  async (req, res) => {
+  console.log(req.body)
+  var data = { ...req.body };
+  var homeWorkID = data.homeWorkID;
+  if(HomeworkService.CancelDone(homeWorkID))
+  {
+    res.status(200).json({
+        message: "Successful",
+    });
+  }
+  else{
+    res.status(409).json({
+      message: "Fail",
+  });
+  }
+};
+//Long-TP ADD END 2022/1/3
 function getCurrentTime() {
   let date_ob = new Date();
 

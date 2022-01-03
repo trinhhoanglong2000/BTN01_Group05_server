@@ -22,6 +22,77 @@ exports.getAllClasses = async (req, res) => {
     });
   }
 };
+exports.getAllClassesAdmin = async (req, res) => {
+
+  const check = await poolean.query(
+    'SELECT * FROM "Account" WHERE "Account".id=$1 ',
+    [req.id]
+  );
+
+  //check admin
+  if (!check.rows[0].admin){
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(404).json({
+      success: false,
+      message: "No class available",
+    });
+    return
+  }
+
+  try {
+    const data = await poolean.query(
+      'SELECT * FROM "Classes"',
+     
+    );
+    // const allData = await poolean.query("SELECT * FROM \"Classes\"")
+    // const classData = await poolean.query("SELECT * FROM classesaccount WHERE accountid=$1",[req.id])
+
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(200).json({ data: data.rows, success: true });
+  } catch (err) {
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(404).json({
+      message: "No class available",
+    });
+  }
+};
+exports.updateClass = async (req, res,id) => {
+  try {
+
+    
+    const check = await poolean.query(
+        'SELECT * FROM "Account" WHERE "Account".id=$1 ',
+        [id]
+      );
+    
+      //check admin
+      if (!check.rows[0].admin){
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(404).json({
+          success: false,
+          message: "No class available",
+        });
+        return
+      }
+    console.log(req);
+    const data = await poolean.query(
+      `UPDATE "Classes" 
+      SET name=$1, section=$2, subject=$3, room=$4
+      WHERE id=$5`,
+      [req.name,req.section,req.subject,req.room,req.id]
+    );
+
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(201).json({ data: data.rows, success: true });
+  } catch (err) {
+    res.header({ "Access-Control-Allow-Origin": "*" });
+    res.status(404).json({
+      success: false,
+      message: "No class available",
+    });
+  }
+};
+
 exports.detail = async function (req, res) {
   const id = req.params.id.toString();
   try {
