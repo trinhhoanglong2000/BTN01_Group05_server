@@ -149,6 +149,7 @@ exports.GetHomeWorkByClassID = async (classId) =>{
       SELECT * 
       FROM  \"Homework\"
       WHERE idclass = $1
+      ORDER BY startday ASC
       `,
         [classId]
       );
@@ -176,3 +177,37 @@ exports.CheckTeacher = async (ClassID, UserID) =>{
     return false
   }
 }
+//Long-TP Add Start 2022/1/3
+exports.MakeDone = async (homeWorkID) =>{
+  try {
+    await poolean.query(
+     `UPDATE \"Homework\"
+     SET isdone = true
+     WHERE id=$1 `,
+    [
+      homeWorkID,  
+    ]
+    );
+    }catch(err){
+      console.log(err);
+      return false;
+    }
+    return true
+}
+exports.CancelDone   = async (homeWorkID) =>{
+  try {
+    await poolean.query(
+     `UPDATE \"Homework\"
+     SET isdone = false
+     WHERE id=$1 `,
+    [
+      homeWorkID,  
+    ]
+    );
+    }catch(err){
+      console.log(err);
+      return false;
+    }
+    return true
+}
+//Long-TP Add END 2022/1/3
