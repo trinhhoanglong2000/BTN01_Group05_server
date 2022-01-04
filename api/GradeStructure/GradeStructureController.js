@@ -23,7 +23,7 @@ exports.GetGradeStructure = async (req, res, user) => {
 //const
 exports.addStructure = async function (req, res) {
     const StructureInfo = req;
-    
+
     try {
         const Structureid = uuidv4();
         const StructureItem = await poolean.query(
@@ -44,6 +44,45 @@ exports.addStructure = async function (req, res) {
     } catch (err) {
         res.status(404).json({
             message: "Recheck your submit information",
+        });
+    }
+};
+
+
+exports.removeStructure = async function (req, res) {
+    try {
+        //
+        const data = await poolean.query(`
+    SELECT *
+    FROM "Homework"
+    WHERE idgradestructure = $1
+    `, [req.body.id])
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        console.log(data.rows)
+        for (var i = 0; i < data.rows.length; i++) {
+            
+            const deleteDataGrade = await poolean.query(`
+                    DELETE FROM grade
+                    WHERE idhomework = $1
+                `, [data.rows[i].id])
+            const deleteDataHomeWork = await poolean.query(`
+                DELETE FROM "Homework"
+                WHERE id = $1
+            `, [data.rows[i].id])
+            
+        }
+
+        const dataRemoved = await poolean.query(`
+        DELETE FROM "GradeStructure"
+        WHERE id = $1
+        `,[req.body.id])
+        console.log(dataRemoved)
+        res.status(200).json({ data: dataRemoved.rows, success: true });
+    } catch (err) {
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(404).json({
+            message: "No grade available",
+            success: false
         });
     }
 };
