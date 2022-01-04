@@ -60,7 +60,7 @@ exports.removeStructure = async function (req, res) {
         res.header({ "Access-Control-Allow-Origin": "*" });
         console.log(data.rows)
         for (var i = 0; i < data.rows.length; i++) {
-            
+
             const deleteDataGrade = await poolean.query(`
                     DELETE FROM grade
                     WHERE idhomework = $1
@@ -69,15 +69,36 @@ exports.removeStructure = async function (req, res) {
                 DELETE FROM "Homework"
                 WHERE id = $1
             `, [data.rows[i].id])
-            
+
         }
 
         const dataRemoved = await poolean.query(`
         DELETE FROM "GradeStructure"
         WHERE id = $1
-        `,[req.body.id])
+        `, [req.body.id])
         console.log(dataRemoved)
         res.status(200).json({ data: dataRemoved.rows, success: true });
+    } catch (err) {
+        res.header({ "Access-Control-Allow-Origin": "*" });
+        res.status(404).json({
+            message: "No grade available",
+            success: false
+        });
+    }
+};
+
+exports.updateStructure = async function (req, res) {
+    try {
+        data = await poolean.query(`
+        UPDATE "GradeStructure"
+        SET description = $1, grade = $2
+        WHERE id = $3
+        `,[
+            req.body.description,
+            req.body.grade,
+            req.body.id
+        ]);
+        res.status(200).json({ data: data.rows, success: true });
     } catch (err) {
         res.header({ "Access-Control-Allow-Origin": "*" });
         res.status(404).json({
