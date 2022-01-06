@@ -11,5 +11,7 @@ router.post('/UploadScore',passport.authenticate('jwt', { session: false }),Home
 //Long-TP ADD START 2022/1/3
 router.post('/MakeDone',passport.authenticate('jwt', { session: false }),HomeWorkController.MakeDone);
 router.post('/InProcess',passport.authenticate('jwt', { session: false }),HomeWorkController.InProcess);
+router.post('/ReviewRequest',passport.authenticate('jwt', { session: false }),HomeWorkController.ReviewRequest);
+router.get('/GetReviewGrade',passport.authenticate('jwt', { session: false }),HomeWorkController.GetReviewGrade);
 //Long-TP ADD END 2022/1/3
 module.exports = router;

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const poolean = require("../../Database/index.js");
 const e = require("express");
+const { cache } = require("joi");
 exports.AddHomeWork = async (req, res) => {
   let userData = null;
   if (
@@ -381,6 +382,52 @@ exports.InProcess =  async (req, res) => {
   });
   }
 };
+
+exports.ReviewRequest =  async (req, res) => {
+  
+  var data = { ...req.body };
+  var homeWorkID = data.homeWorkID;
+  var idaccount  = data.idaccount  
+  var expectationMess  = data.expectationMess 
+  var expectationGrade  = data.expectationGrade
+  var oldGrade = data.oldGrade
+  var createDate  = getCurrentTime() ;
+  console.log(data)
+  
+  if( await HomeworkService.AddReviewRequest(homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade))
+  {
+    console.log("AddReviewRequest")
+    res.status(200).json({
+        message: "Successful",
+    });
+  }
+  else if (await HomeworkService.UploadReviewRequest(homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade))
+  {
+    console.log("UpdateHomeWork")
+    res.status(200).json({
+      message: "Successful",
+  });
+  }
+  else{
+    res.status(409).json({
+      message: "Fail",
+  });
+  }
+};
+
+exports.GetReviewGrade = async (req, res) => {
+  var homeWorkID = req.query.homeWorkID;
+  var idaccount  = req.query.idaccount; 
+  try {
+    const reviewRequest = await HomeworkService.GetReviewRequest(homeWorkID,idaccount)
+    res.status(200).json({ message: "Successful", data: reviewRequest[0] });
+    
+  }
+  catch(e){
+    res.status(400).json({ message: "Fail", data: null });
+  }
+};
+
 //Long-TP ADD END 2022/1/3
 function getCurrentTime() {
   let date_ob = new Date();

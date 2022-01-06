@@ -210,4 +210,84 @@ exports.CancelDone   = async (homeWorkID) =>{
     }
     return true
 }
+exports.CheckReviewRequest = async (homeWorkID,idaccount)=> {
+  try {
+      const COUNT = await poolean.query(
+      `
+      SELECT COUNT(*) 
+      FROM  \"gradereview\"
+      WHERE idhomework = $1 AND idaccount = $2
+      `,
+        [homeWorkID,idaccount]
+      );
+      
+      if(COUNT.rows[0].count != 0 )
+          return true
+      else
+          return false
+    } catch (err) {
+      return false
+    }
+}
+exports.AddReviewRequest =async (homeWorkID,idaccount,expectationMess,expectationGrade,createDate, oldGrade) =>{
+  console.log("AddReviewRequest 1");
+  try {
+    console.log("AddReviewRequest 2");
+      if(this.CheckReviewRequest(homeWorkID,idaccount))
+        return false
+        console.log("AddReviewRequest 3");
+      await poolean.query(
+      `
+      INSERT INTO \"gradereview\" (idhomework,idaccount,expectationMess,expectationGrade,createDate,oldGrade, finalgrade,teachermess,donedate)
+      VALUES ($1, $2, $3, $4, $5,$6,$7,$8,$9)
+      `,
+      [
+        homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade,null,null,null
+      ]
+      )
+      console.log("AddReviewRequest 4");
+      console.log("AddReviewRequest after");
+  }catch(err){
+      console.log(err);
+      return false;
+  }
+  return true
+}
+exports.UploadReviewRequest   = async (homeWorkID,idaccount,expectationMess,expectationGrade,createDate, oldGrade) =>{
+  try {
+    if(!this.CheckReviewRequest(homeWorkID,idaccount))
+      return false
+     await poolean.query(
+     `UPDATE \"gradereview\"
+      SET expectationMess=$3,
+      expectationgrade=$4 , createdate=$5, oldgrade=$6, finalgrade= $7,teachermess=$8, donedate=$9
+      WHERE idhomework = $1 AND idaccount = $2 `,
+    [
+      homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade,null,null,null
+    ]
+    )
+    }catch(err){
+      console.log(err);
+      return false;
+    }
+    return true
+}
+exports.GetReviewRequest = async (homeWorkID,idaccount) =>{
+  try {
+      const ReviewRequest = await poolean.query(
+      `
+      SELECT * 
+      FROM  \"gradereview\"
+      WHERE idhomework = $1 AND idaccount = $2
+      ORDER BY createDate ASC
+      `,
+        [homeWorkID,idaccount]
+      );
+      return ReviewRequest.rows
+  }catch(err){
+      console.log(err);
+      return null;
+  }
+}
+
 //Long-TP Add END 2022/1/3
