@@ -392,7 +392,7 @@ exports.ReviewRequest =  async (req, res) => {
   var expectationGrade  = data.expectationGrade
   var oldGrade = data.oldGrade
   var createDate  = getCurrentTime() ;
-  console.log(data)
+  console.log("add review req", data)
   
   if( await HomeworkService.AddReviewRequest(homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade))
   {

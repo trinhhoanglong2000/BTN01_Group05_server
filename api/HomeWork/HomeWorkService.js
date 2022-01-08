@@ -1,5 +1,6 @@
 const poolean = require("../../Database/index.js");
 const { v4: uuidv4 } = require("uuid");
+const { number } = require("joi");
 
 exports.AddHomeWork =async (homeWork,id) =>{
     try {
@@ -220,8 +221,8 @@ exports.CheckReviewRequest = async (homeWorkID,idaccount)=> {
       `,
         [homeWorkID,idaccount]
       );
-      
-      if(COUNT.rows[0].count != 0 )
+      console.log("Test " + COUNT.rows[0].count)
+      if( COUNT.rows[0].count != 0 )
           return true
       else
           return false
@@ -233,9 +234,12 @@ exports.AddReviewRequest =async (homeWorkID,idaccount,expectationMess,expectatio
   console.log("AddReviewRequest 1");
   try {
     console.log("AddReviewRequest 2");
-      if(this.CheckReviewRequest(homeWorkID,idaccount))
-        return false
+      if(await this.CheckReviewRequest(homeWorkID,idaccount)){
         console.log("AddReviewRequest 3");
+        return false
+      }
+        
+        console.log("AddReviewRequest 4");
       await poolean.query(
       `
       INSERT INTO \"gradereview\" (idhomework,idaccount,expectationMess,expectationGrade,createDate,oldGrade, finalgrade,teachermess,donedate)
@@ -245,7 +249,7 @@ exports.AddReviewRequest =async (homeWorkID,idaccount,expectationMess,expectatio
         homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade,null,null,null
       ]
       )
-      console.log("AddReviewRequest 4");
+      console.log("AddReviewRequest 5");
       console.log("AddReviewRequest after");
   }catch(err){
       console.log(err);
@@ -255,8 +259,11 @@ exports.AddReviewRequest =async (homeWorkID,idaccount,expectationMess,expectatio
 }
 exports.UploadReviewRequest   = async (homeWorkID,idaccount,expectationMess,expectationGrade,createDate, oldGrade) =>{
   try {
-    if(!this.CheckReviewRequest(homeWorkID,idaccount))
+    if(!(await this.CheckReviewRequest(homeWorkID,idaccount))){
       return false
+    }
+     
+      console.log("UpdateHomeWork")
      await poolean.query(
      `UPDATE \"gradereview\"
       SET expectationMess=$3,
@@ -274,7 +281,7 @@ exports.UploadReviewRequest   = async (homeWorkID,idaccount,expectationMess,expe
 }
 exports.CofirmReviewRequest   = async (homeWorkID,idaccount,finalgrade,teachermess,donedate, oldGrade) =>{
   try {
-    if(!this.CheckReviewRequest(homeWorkID,idaccount))
+    if(!(await this.CheckReviewRequest(homeWorkID,idaccount)))
       return false
      await poolean.query(
      `UPDATE \"gradereview\"
