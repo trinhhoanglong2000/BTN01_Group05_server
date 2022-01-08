@@ -403,7 +403,7 @@ exports.ReviewRequest =  async (req, res) => {
   }
   else if (await HomeworkService.UploadReviewRequest(homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade))
   {
-    console.log("UpdateHomeWork")
+
     res.status(200).json({
       message: "Successful",
   });
@@ -427,7 +427,7 @@ exports.ReviewResponse =  async (req, res) => {
   console.log("data")
   if (await HomeworkService.CofirmReviewRequest(homeWorkID,idaccount,finalgrade,teachermess,donedate, oldGrade))
    {
-    await HomeworkService.UpdateHomeWorkReview(homeWorkID,finalgrade,donedate)
+    await HomeworkService.UpdateHomeWorkReview(homeWorkID,idaccount,finalgrade)
      res.status(200).json({
       message: "Successful",
   });
@@ -461,6 +461,43 @@ exports.GetAllReviewRequest = async (req, res) => {
   }
   catch(e){
     res.status(400).json({ message: "Fail", data: null });
+  }
+};
+exports.GetReviewComment = async (req, res) => {
+  var homeWorkID = req.query.homeWorkID;
+  var idaccount  = req.query.idaccount; 
+  console.log(req.query)
+  try {
+    const reviewComment = await HomeworkService.GetReviewComment(homeWorkID,idaccount)
+    res.status(200).json({ message: "Successful", data: reviewComment });
+    
+  }
+  catch(e){
+    res.status(400).json({ message: "Fail", data: null });
+  }
+};
+
+exports.AddReviewComment =  async (req, res) => {
+  
+  var data = { ...req.body };
+  var homeWorkID = data.homeWorkID;
+  var idaccount  = data.idaccount  
+  var content  = data.content 
+  var isteacher  = data.isteacher
+  var createDate  = getCurrentTime() ;
+  console.log("add review cmt", data)
+  
+  if( await HomeworkService.AddReviewComment(homeWorkID,idaccount,content,isteacher,createDate))
+  {
+    console.log("AddReviewComment")
+    res.status(200).json({
+        message: "Successful",
+    });
+  }
+  else{
+    res.status(409).json({
+      message: "Fail",
+  });
   }
 };
 

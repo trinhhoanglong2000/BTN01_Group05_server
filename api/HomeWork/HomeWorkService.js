@@ -298,14 +298,14 @@ exports.CofirmReviewRequest   = async (homeWorkID,idaccount,finalgrade,teacherme
     }
     return true
 }
-exports.UpdateHomeWorkReview =async (homeWorkID,grade,endday) =>{
+exports.UpdateHomeWorkReview =async (homeWorkID,idaccount, grade) =>{
   try {
        await poolean.query(
         `UPDATE \"grade\"
-        SET  grade = $2
-        WHERE id=$1 `,
+        SET  grade = $3
+        WHERE idhomework=$1, idaccount=$2 `,
       [
-        homeWorkID,grade
+        homeWorkID,idaccount,grade
       ]
       );
   }catch(err){
@@ -352,5 +352,41 @@ exports.GetAllReviewRequest = async (idclass) =>{
       console.log(err);
       return null;
   }
+}
+exports.GetReviewComment = async (homeWorkID,idaccount) =>{
+  try {
+      const ReviewRequest = await poolean.query(
+        `
+        SElect acc.username, acc.firstname, acc.lastname, commentData.createdate, commentData.content, commentData.isteacher From 
+        (SELECT * 
+           FROM  public."reviewcomment" as rw WHERE rw.idhomework = $1 AND rw.idaccount = $2
+           ORDER BY rw.createDate ASC) as commentData LEFT JOIN public."Account" as acc on commentData.idaccount = acc.id ORDER BY commentData.createdate DESC
+         `,
+        [homeWorkID,idaccount]
+      );
+      return ReviewRequest.rows
+  }catch(err){
+      console.log(err);
+      return null;
+  }
+}
+exports.AddReviewComment =async (homeWorkID,idaccount,content,isteacher,createDate) =>{
+  try {
+  
+      await poolean.query(
+      `
+      INSERT INTO public."reviewcomment" (idhomework,idaccount,content,isteacher,createDate)
+      VALUES ($1, $2, $3, $4, $5)
+      `,
+      [
+        homeWorkID,idaccount,content,isteacher,createDate
+      ]
+      )
+
+  }catch(err){
+      console.log(err);
+      return false;
+  }
+  return true
 }
 //Long-TP Add END 2022/1/3
