@@ -13,5 +13,7 @@ router.post('/MakeDone',passport.authenticate('jwt', { session: false }),HomeWor
 router.post('/InProcess',passport.authenticate('jwt', { session: false }),HomeWorkController.InProcess);
 router.post('/ReviewRequest',passport.authenticate('jwt', { session: false }),HomeWorkController.ReviewRequest);
 router.get('/GetReviewGrade',passport.authenticate('jwt', { session: false }),HomeWorkController.GetReviewGrade);
+router.get('/GetAllReviewRequest',passport.authenticate('jwt', { session: false }),HomeWorkController.GetAllReviewRequest);
+router.post('/ReviewResponse',passport.authenticate('jwt', { session: false }),HomeWorkController.ReviewResponse);
 //Long-TP ADD END 2022/1/3
 module.exports = router;

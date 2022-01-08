@@ -272,6 +272,41 @@ exports.UploadReviewRequest   = async (homeWorkID,idaccount,expectationMess,expe
     }
     return true
 }
+exports.CofirmReviewRequest   = async (homeWorkID,idaccount,finalgrade,teachermess,donedate, oldGrade) =>{
+  try {
+    if(!this.CheckReviewRequest(homeWorkID,idaccount))
+      return false
+     await poolean.query(
+     `UPDATE \"gradereview\"
+      SET oldgrade=$3, finalgrade= $4,teachermess=$5, donedate=$6
+      WHERE idhomework = $1 AND idaccount = $2 `,
+    [
+      homeWorkID,idaccount, oldGrade,finalgrade,teachermess,donedate
+    ]
+    )
+     
+    }catch(err){
+      console.log(err);
+      return false;
+    }
+    return true
+}
+exports.UpdateHomeWorkReview =async (homeWorkID,grade,endday) =>{
+  try {
+       await poolean.query(
+        `UPDATE \"grade\"
+        SET  grade = $2
+        WHERE id=$1 `,
+      [
+        homeWorkID,grade
+      ]
+      );
+  }catch(err){
+      console.log(err);
+      return false;
+  }
+  return true
+}
 exports.GetReviewRequest = async (homeWorkID,idaccount) =>{
   try {
       const ReviewRequest = await poolean.query(
@@ -290,4 +325,25 @@ exports.GetReviewRequest = async (homeWorkID,idaccount) =>{
   }
 }
 
+exports.GetAllReviewRequest = async (idclass) =>{
+  try {
+      const ReviewRequest = await poolean.query(
+      `
+      Select * From 
+      (SELECT * 
+        FROM  gradereview as gr
+      LEFT JOIN public."Homework" as hw
+      ON gr.idhomework = hw.id
+      Where hw.idclass =$1
+      ORDER BY gr.createdate DESC )as reviewreq
+      LEFT JOIN public."Account" as acc ON reviewreq.idaccount = acc.id
+      `,
+        [idclass]
+      );
+      return ReviewRequest.rows
+  }catch(err){
+      console.log(err);
+      return null;
+  }
+}
 //Long-TP Add END 2022/1/3

@@ -414,6 +414,30 @@ exports.ReviewRequest =  async (req, res) => {
   });
   }
 };
+exports.ReviewResponse =  async (req, res) => {
+  
+  var data = { ...req.body };
+  var homeWorkID = data.homeWorkID;
+  var idaccount  = data.idaccount  
+  var finalgrade  = data.finalgrade 
+  var teachermess  = data.teachermess
+  var oldGrade = finalgrade
+  var donedate  = getCurrentTime() ;
+  console.log(data)
+  console.log("data")
+  if (await HomeworkService.CofirmReviewRequest(homeWorkID,idaccount,finalgrade,teachermess,donedate, oldGrade))
+   {
+    await HomeworkService.UpdateHomeWorkReview(homeWorkID,finalgrade,donedate)
+     res.status(200).json({
+      message: "Successful",
+  });
+  }
+  else{
+    res.status(409).json({
+      message: "Fail",
+  });
+  }
+};
 
 exports.GetReviewGrade = async (req, res) => {
   var homeWorkID = req.query.homeWorkID;
@@ -421,6 +445,18 @@ exports.GetReviewGrade = async (req, res) => {
   try {
     const reviewRequest = await HomeworkService.GetReviewRequest(homeWorkID,idaccount)
     res.status(200).json({ message: "Successful", data: reviewRequest[0] });
+    
+  }
+  catch(e){
+    res.status(400).json({ message: "Fail", data: null });
+  }
+};
+exports.GetAllReviewRequest = async (req, res) => {
+  var idclass  = req.query.idclass; 
+  console.log(idclass)
+  try {
+    const reviewRequest = await HomeworkService.GetAllReviewRequest(idclass)
+    res.status(200).json({ message: "Successful", data: reviewRequest });
     
   }
   catch(e){
