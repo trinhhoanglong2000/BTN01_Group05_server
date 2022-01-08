@@ -53,8 +53,16 @@ io.on("connection", (socket) => {
     console.log(username + " added to online section")
     console.log(onlineUsers.length)
   })
-  socket.on("removeUser", () =>{
+  socket.on("removeUser", () => {
     removeUser(socket.id)
+    console.log(onlineUsers.length)
+  })
+  socket.on("sendNotification", ({receiverId,message}) => {
+    const receiver = getUser(receiverId)
+    if (receiver != undefined) {
+      console.log("sent")
+      io.to(receiver.socketId).emit("getNotification", { message })
+    }
     console.log(onlineUsers.length)
   })
   socket.on("disconnect", () => {
