@@ -110,7 +110,7 @@ exports.GetAllGradeOfStudentFromClass = async (req, res, user) => {
     const data = await poolean.query(
       ` SELECT * 
         FROM "Homework" INNER JOIN grade ON ("Homework".id = grade.idhomework)
-        WHERE grade.idclass = $1 and grade.idaccount = $2`, [id,user.id]
+        WHERE grade.idclass = $1 and grade.idaccount = $2 AND "Homework".isdone = true`, [id,user.id]
     );
     // ,[id,user.id]);
     res.header({ "Access-Control-Allow-Origin": "*" });
