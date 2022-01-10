@@ -361,29 +361,30 @@ exports.GetAllReviewRequest = async (idclass) => {
       ORDER BY gr.createdate DESC )as reviewreq
       LEFT JOIN public."Account" as acc ON reviewreq.idaccount = acc.id
       `,
-      [idclass]
-    );
-    return ReviewRequest.rows
-  } catch (err) {
-    console.log(err);
-    return null;
+        [idclass]
+      );
+      
+      return ReviewRequest.rows
+  }catch(err){
+      console.log(err);
+      return null;
   }
 }
 exports.GetReviewComment = async (homeWorkID, idaccount) => {
   try {
-    const ReviewRequest = await poolean.query(
-      `
-        SElect acc.username, acc.firstname, acc.lastname, commentData.createdate, commentData.content, commentData.isteacher From 
-        (SELECT * 
+      const ReviewRequest = await poolean.query(
+        `
+        SELECT * 
            FROM  public."reviewcomment" as rw WHERE rw.idhomework = $1 AND rw.idaccount = $2
-           ORDER BY rw.createDate ASC) as commentData LEFT JOIN public."Account" as acc on commentData.idaccount = acc.id ORDER BY commentData.createdate DESC
+           ORDER BY rw.createDate DESC
          `,
-      [homeWorkID, idaccount]
-    );
-    return ReviewRequest.rows
-  } catch (err) {
-    console.log(err);
-    return null;
+        [homeWorkID,idaccount]
+      );
+      console.log(ReviewRequest.rows)
+      return ReviewRequest.rows
+  }catch(err){
+      console.log(err);
+      return null;
   }
 }
 exports.AddReviewComment = async (homeWorkID, idaccount, content, isteacher, createDate) => {
