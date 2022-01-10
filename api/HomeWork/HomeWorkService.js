@@ -347,6 +347,7 @@ exports.GetAllReviewRequest = async (idclass) =>{
       `,
         [idclass]
       );
+      
       return ReviewRequest.rows
   }catch(err){
       console.log(err);
@@ -357,13 +358,13 @@ exports.GetReviewComment = async (homeWorkID,idaccount) =>{
   try {
       const ReviewRequest = await poolean.query(
         `
-        SElect acc.username, acc.firstname, acc.lastname, commentData.createdate, commentData.content, commentData.isteacher From 
-        (SELECT * 
+        SELECT * 
            FROM  public."reviewcomment" as rw WHERE rw.idhomework = $1 AND rw.idaccount = $2
-           ORDER BY rw.createDate ASC) as commentData LEFT JOIN public."Account" as acc on commentData.idaccount = acc.id ORDER BY commentData.createdate DESC
+           ORDER BY rw.createDate DESC
          `,
         [homeWorkID,idaccount]
       );
+      console.log(ReviewRequest.rows)
       return ReviewRequest.rows
   }catch(err){
       console.log(err);
