@@ -2,339 +2,355 @@ const poolean = require("../../Database/index.js");
 const { v4: uuidv4 } = require("uuid");
 const { number } = require("joi");
 
-exports.AddHomeWork =async (homeWork,id) =>{
-    try {
-        await poolean.query(
-        `
+exports.AddHomeWork = async (homeWork, id) => {
+  try {
+    await poolean.query(
+      `
         INSERT INTO \"Homework\" (id, idclass, name,description, grade, startday,endday,idgradestructure)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
         `,
-        [
-            id,
-            homeWork.idclass,
-            homeWork.name,
-            homeWork.description,
-            homeWork.grade,
-            homeWork.startday,
-            homeWork.endday,
-            homeWork.idgradestructure
-        ]
-        );
-    }catch(err){
-        console.log(err);
-        return false;
-    }
-    return true
+      [
+        id,
+        homeWork.idclass,
+        homeWork.name,
+        homeWork.description,
+        homeWork.grade,
+        homeWork.startday,
+        homeWork.endday,
+        homeWork.idgradestructure
+      ]
+    );
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+  return true
 }
 exports.CheckClass = async (idclass) => {
-    try {
-        const COUNT = await poolean.query(
-        `
+  try {
+    const COUNT = await poolean.query(
+      `
         SELECT COUNT(*) 
         FROM "Classes"
         WHERE id = $1
         `,
-          [idclass]
-        );
- 
+      [idclass]
+    );
 
-        if(COUNT.rows[0].count != 0 ){
-            return true
-        }else{
-            return false
-        }
-      } catch (err) {
-        return false
-      }
+
+    if (COUNT.rows[0].count != 0) {
+      return true
+    } else {
+      return false
+    }
+  } catch (err) {
+    return false
+  }
 }
 exports.CheckGradeStructure = async (idgradestructure) => {
 
-    if (idgradestructure==null) return false    
-    try {
-        const COUNT = await poolean.query(
-        `
+  if (idgradestructure == null) return false
+  try {
+    const COUNT = await poolean.query(
+      `
         SELECT COUNT(*) 
         FROM "GradeStructure"
         WHERE id = $1
         `,
-          [idgradestructure]
-        );
+      [idgradestructure]
+    );
 
-        if(COUNT.rows[0].count != 0 )
-            return true;
-        else
-            return false;
-      } catch (err) {
-        return false
-      }
+    if (COUNT.rows[0].count != 0)
+      return true;
+    else
+      return false;
+  } catch (err) {
+    return false
+  }
 }
 exports.CheckHomeWork = async (id) => {
   try {
-      const COUNT = await poolean.query(
+    const COUNT = await poolean.query(
       `
       SELECT COUNT(*) 
       FROM  \"Homework\"
       WHERE id = $1
       `,
-        [id]
-      );
-      
-      if(COUNT.rows[0].count != 0 )
-          return true
-      else
-          return false
-    } catch (err) {
+      [id]
+    );
+
+    if (COUNT.rows[0].count != 0)
+      return true
+    else
       return false
-    }
+  } catch (err) {
+    return false
+  }
 }
-exports.UpdateHomeWork =async (homeWork) =>{
+exports.UpdateHomeWork = async (homeWork) => {
   try {
-       await poolean.query(
-        `UPDATE \"Homework\"
+    await poolean.query(
+      `UPDATE \"Homework\"
         SET  name =$2 ,description = $3, grade = $4, endday=$5, idgradestructure=$6
         WHERE id=$1 `,
       [
-          homeWork.id,
-          homeWork.name,
-          homeWork.description,
-          homeWork.grade,
-          homeWork.endday,
-          homeWork.idgradestructure,
+        homeWork.id,
+        homeWork.name,
+        homeWork.description,
+        homeWork.grade,
+        homeWork.endday,
+        homeWork.idgradestructure,
       ]
-      );
-  }catch(err){
-      console.log(err);
-      return false;
+    );
+  } catch (err) {
+    console.log(err);
+    return false;
   }
   return true
 }
 
-exports.RemoveHomeWork = async (homeWorkID) =>{
+exports.RemoveHomeWork = async (homeWorkID) => {
   try {
-      const homeWork = await poolean.query(
+    
+    const deleteReview = await poolean.query(
+      `
+      DELETE FROM gradereview
+        WHERE idhomework = $1
+        `,
+      [homeWorkID.id]
+    );
+    const deleteCmt = await poolean.query(
+      `
+      DELETE FROM reviewcomment
+          WHERE idhomework = $1
+          `,
+      [homeWorkID.id]
+    );
+    
+    const homeWork = await poolean.query(
       `
       SELECT * 
       FROM  \"Homework\"
       WHERE id = $1
       LIMIT 1
       `,
-        [homeWorkID.id]
-      );
-      await poolean.query(
-        `DELETE FROM "grade" WHERE idclass = $1 AND idhomework = $2;
+      [homeWorkID.id]
+    );
+    await poolean.query(
+      `DELETE FROM grade WHERE idclass = $1 AND idhomework = $2;
          `,
       [
         homeWork.rows[0].idclass,
-        homeWork.rows[0].idhomework
+        homeWork.rows[0].id
       ]
-      );
-      await poolean.query(
-        `
+    );
+    await poolean.query(
+      `
         DELETE FROM "Homework" WHERE id = $1;
          `,
       [
         homeWork.rows[0].id
       ]
-      );
-  }catch(err){
-      console.log(err);
-      return false;
+    );
+  } catch (err) {
+    console.log(err);
+    return false;
   }
   return true
 }
-exports.GetHomeWorkByClassID = async (classId) =>{
+exports.GetHomeWorkByClassID = async (classId) => {
   try {
-      const homeWork = await poolean.query(
+    const homeWork = await poolean.query(
       `
       SELECT * 
       FROM  \"Homework\"
       WHERE idclass = $1
       ORDER BY startday ASC
       `,
-        [classId]
-      );
-      return homeWork.rows
-  }catch(err){
-      console.log(err);
-      return null;
+      [classId]
+    );
+    return homeWork.rows
+  } catch (err) {
+    console.log(err);
+    return null;
   }
 }
-exports.CheckTeacher = async (ClassID, UserID) =>{
+exports.CheckTeacher = async (ClassID, UserID) => {
   try {
     const COUNT = await poolean.query(
-    `
+      `
     SELECT COUNT(*) 
     FROM \"classesaccount\"
     WHERE classid = $1 AND accountid = $2 AND type = true
     `,
-    [ClassID, UserID]
+      [ClassID, UserID]
     );
-    if(COUNT.rows[0].count != 0 )
-        return true
+    if (COUNT.rows[0].count != 0)
+      return true
     else
-        return false
+      return false
   } catch (err) {
     return false
   }
 }
 //Long-TP Add Start 2022/1/3
-exports.MakeDone = async (homeWorkID) =>{
+exports.MakeDone = async (homeWorkID) => {
   try {
     await poolean.query(
-     `UPDATE \"Homework\"
+      `UPDATE \"Homework\"
      SET isdone = true
      WHERE id=$1 `,
-    [
-      homeWorkID,  
-    ]
+      [
+        homeWorkID,
+      ]
     );
-    }catch(err){
-      console.log(err);
-      return false;
-    }
-    return true
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+  return true
 }
-exports.CancelDone   = async (homeWorkID) =>{
+exports.CancelDone = async (homeWorkID) => {
   try {
     await poolean.query(
-     `UPDATE \"Homework\"
+      `UPDATE \"Homework\"
      SET isdone = false
      WHERE id=$1 `,
-    [
-      homeWorkID,  
-    ]
+      [
+        homeWorkID,
+      ]
     );
-    }catch(err){
-      console.log(err);
-      return false;
-    }
-    return true
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+  return true
 }
-exports.CheckReviewRequest = async (homeWorkID,idaccount)=> {
+exports.CheckReviewRequest = async (homeWorkID, idaccount) => {
   try {
-      const COUNT = await poolean.query(
+    const COUNT = await poolean.query(
       `
       SELECT COUNT(*) 
       FROM  \"gradereview\"
       WHERE idhomework = $1 AND idaccount = $2
       `,
-        [homeWorkID,idaccount]
-      );
-      console.log("Test " + COUNT.rows[0].count)
-      if( COUNT.rows[0].count != 0 )
-          return true
-      else
-          return false
-    } catch (err) {
+      [homeWorkID, idaccount]
+    );
+    console.log("Test " + COUNT.rows[0].count)
+    if (COUNT.rows[0].count != 0)
+      return true
+    else
       return false
-    }
+  } catch (err) {
+    return false
+  }
 }
-exports.AddReviewRequest =async (homeWorkID,idaccount,expectationMess,expectationGrade,createDate, oldGrade) =>{
+exports.AddReviewRequest = async (homeWorkID, idaccount, expectationMess, expectationGrade, createDate, oldGrade) => {
   console.log("AddReviewRequest 1");
   try {
     console.log("AddReviewRequest 2");
-      if(await this.CheckReviewRequest(homeWorkID,idaccount)){
-        console.log("AddReviewRequest 3");
-        return false
-      }
-        
-        console.log("AddReviewRequest 4");
-      await poolean.query(
+    if (await this.CheckReviewRequest(homeWorkID, idaccount)) {
+      console.log("AddReviewRequest 3");
+      return false
+    }
+
+    console.log("AddReviewRequest 4");
+    await poolean.query(
       `
       INSERT INTO \"gradereview\" (idhomework,idaccount,expectationMess,expectationGrade,createDate,oldGrade, finalgrade,teachermess,donedate)
       VALUES ($1, $2, $3, $4, $5,$6,$7,$8,$9)
       `,
       [
-        homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade,null,null,null
+        homeWorkID, idaccount, expectationMess, expectationGrade, createDate, oldGrade, null, null, null
       ]
-      )
-      console.log("AddReviewRequest 5");
-      console.log("AddReviewRequest after");
-  }catch(err){
-      console.log(err);
-      return false;
+    )
+    console.log("AddReviewRequest 5");
+    console.log("AddReviewRequest after");
+  } catch (err) {
+    console.log(err);
+    return false;
   }
   return true
 }
-exports.UploadReviewRequest   = async (homeWorkID,idaccount,expectationMess,expectationGrade,createDate, oldGrade) =>{
+exports.UploadReviewRequest = async (homeWorkID, idaccount, expectationMess, expectationGrade, createDate, oldGrade) => {
   try {
-    if(!(await this.CheckReviewRequest(homeWorkID,idaccount))){
+    if (!(await this.CheckReviewRequest(homeWorkID, idaccount))) {
       return false
     }
-     
-      console.log("UpdateHomeWork")
-     await poolean.query(
-     `UPDATE \"gradereview\"
+
+    console.log("UpdateHomeWork")
+    await poolean.query(
+      `UPDATE \"gradereview\"
       SET expectationMess=$3,
       expectationgrade=$4 , createdate=$5, oldgrade=$6, finalgrade= $7,teachermess=$8, donedate=$9
       WHERE idhomework = $1 AND idaccount = $2 `,
-    [
-      homeWorkID,idaccount,expectationMess,expectationGrade,createDate,oldGrade,null,null,null
-    ]
-    )
-    }catch(err){
-      console.log(err);
-      return false;
-    }
-    return true
-}
-exports.CofirmReviewRequest   = async (homeWorkID,idaccount,finalgrade,teachermess,donedate, oldGrade) =>{
-  try {
-    if(!(await this.CheckReviewRequest(homeWorkID,idaccount)))
-      return false
-     await poolean.query(
-     `UPDATE \"gradereview\"
-      SET oldgrade=$3, finalgrade= $4,teachermess=$5, donedate=$6
-      WHERE idhomework = $1 AND idaccount = $2 `,
-    [
-      homeWorkID,idaccount, oldGrade,finalgrade,teachermess,donedate
-    ]
-    )
-     
-    }catch(err){
-      console.log(err);
-      return false;
-    }
-    return true
-}
-exports.UpdateHomeWorkReview =async (homeWorkID,idaccount, grade) =>{
-  try {
-       await poolean.query(
-        `UPDATE \"grade\"
-        SET  grade = $3
-        WHERE idhomework=$1, idaccount=$2 `,
       [
-        homeWorkID,idaccount,grade
+        homeWorkID, idaccount, expectationMess, expectationGrade, createDate, oldGrade, null, null, null
       ]
-      );
-  }catch(err){
-      console.log(err);
-      return false;
+    )
+  } catch (err) {
+    console.log(err);
+    return false;
   }
   return true
 }
-exports.GetReviewRequest = async (homeWorkID,idaccount) =>{
+exports.CofirmReviewRequest = async (homeWorkID, idaccount, finalgrade, teachermess, donedate, oldGrade) => {
   try {
-      const ReviewRequest = await poolean.query(
+    if (!(await this.CheckReviewRequest(homeWorkID, idaccount)))
+      return false
+    await poolean.query(
+      `UPDATE \"gradereview\"
+      SET oldgrade=$3, finalgrade= $4,teachermess=$5, donedate=$6
+      WHERE idhomework = $1 AND idaccount = $2 `,
+      [
+        homeWorkID, idaccount, oldGrade, finalgrade, teachermess, donedate
+      ]
+    )
+
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+  return true
+}
+exports.UpdateHomeWorkReview = async (homeWorkID, idaccount, grade) => {
+  try {
+    await poolean.query(
+      `UPDATE \"grade\"
+        SET  grade = $3
+        WHERE idhomework=$1, idaccount=$2 `,
+      [
+        homeWorkID, idaccount, grade
+      ]
+    );
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+  return true
+}
+exports.GetReviewRequest = async (homeWorkID, idaccount) => {
+  try {
+    const ReviewRequest = await poolean.query(
       `
       SELECT * 
       FROM  \"gradereview\"
       WHERE idhomework = $1 AND idaccount = $2
       ORDER BY createDate ASC
       `,
-        [homeWorkID,idaccount]
-      );
-      return ReviewRequest.rows
-  }catch(err){
-      console.log(err);
-      return null;
+      [homeWorkID, idaccount]
+    );
+    return ReviewRequest.rows
+  } catch (err) {
+    console.log(err);
+    return null;
   }
 }
 
-exports.GetAllReviewRequest = async (idclass) =>{
+exports.GetAllReviewRequest = async (idclass) => {
   try {
-      const ReviewRequest = await poolean.query(
+    const ReviewRequest = await poolean.query(
       `
       Select * From 
       (SELECT * 
@@ -345,47 +361,47 @@ exports.GetAllReviewRequest = async (idclass) =>{
       ORDER BY gr.createdate DESC )as reviewreq
       LEFT JOIN public."Account" as acc ON reviewreq.idaccount = acc.id
       `,
-        [idclass]
-      );
-      return ReviewRequest.rows
-  }catch(err){
-      console.log(err);
-      return null;
+      [idclass]
+    );
+    return ReviewRequest.rows
+  } catch (err) {
+    console.log(err);
+    return null;
   }
 }
-exports.GetReviewComment = async (homeWorkID,idaccount) =>{
+exports.GetReviewComment = async (homeWorkID, idaccount) => {
   try {
-      const ReviewRequest = await poolean.query(
-        `
+    const ReviewRequest = await poolean.query(
+      `
         SElect acc.username, acc.firstname, acc.lastname, commentData.createdate, commentData.content, commentData.isteacher From 
         (SELECT * 
            FROM  public."reviewcomment" as rw WHERE rw.idhomework = $1 AND rw.idaccount = $2
            ORDER BY rw.createDate ASC) as commentData LEFT JOIN public."Account" as acc on commentData.idaccount = acc.id ORDER BY commentData.createdate DESC
          `,
-        [homeWorkID,idaccount]
-      );
-      return ReviewRequest.rows
-  }catch(err){
-      console.log(err);
-      return null;
+      [homeWorkID, idaccount]
+    );
+    return ReviewRequest.rows
+  } catch (err) {
+    console.log(err);
+    return null;
   }
 }
-exports.AddReviewComment =async (homeWorkID,idaccount,content,isteacher,createDate) =>{
+exports.AddReviewComment = async (homeWorkID, idaccount, content, isteacher, createDate) => {
   try {
-  
-      await poolean.query(
+
+    await poolean.query(
       `
       INSERT INTO public."reviewcomment" (idhomework,idaccount,content,isteacher,createDate)
       VALUES ($1, $2, $3, $4, $5)
       `,
       [
-        homeWorkID,idaccount,content,isteacher,createDate
+        homeWorkID, idaccount, content, isteacher, createDate
       ]
-      )
+    )
 
-  }catch(err){
-      console.log(err);
-      return false;
+  } catch (err) {
+    console.log(err);
+    return false;
   }
   return true
 }
